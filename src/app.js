@@ -34,6 +34,7 @@ function formatDay(timestamp) {
 
 
 function showTemperature (response) {
+    
 let temperatureElement= document.querySelector("#temperature");
 let cityElement= document.querySelector("#city");
 let descriptionElement= document.querySelector("#description");
@@ -55,16 +56,6 @@ iconElement.setAttribute("alt", response.data.condition.description);
 function search(city) {
     let apiKey= "b80ba723209860a35452o2bb8f4f0tb3";
     let apiUrl= `https://api.shecodes.io/weather/v1/current?query=${city}&key=${apiKey}&units=metric`;
-    axios.get(apiUrl).then(showTemperature);
     }
-    
-
-function handleSubmit(event) {
-    event.preventDefault();
-    let cityInputElement = document.querySelector("#city-input");
-    search(cityInputElement.value);
-}
-
-let form = document.querySelector("#search-form");
-form.addEventListener("submit", handleSubmit);
+    axios.get(apiUrl).then(showTemperature);
 search ("Tehran");
