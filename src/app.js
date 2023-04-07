@@ -43,6 +43,8 @@ let windElement= document.querySelector("#wind");
 let dateElement= document.querySelector("#date");
 let iconElement= document.querySelector("#icon");
 
+celsiusTemperature = response.data.temperature.current;
+
 temperatureElement.innerHTML= Math.round(response.data.temperature.current);
 cityElement.innerHTML= response.data.city;
 descriptionElement.innerHTML= response.data.condition.description;
@@ -56,6 +58,43 @@ iconElement.setAttribute("alt", response.data.condition.description);
 function search(city) {
     let apiKey= "b80ba723209860a35452o2bb8f4f0tb3";
     let apiUrl= `https://api.shecodes.io/weather/v1/current?query=${city}&key=${apiKey}&units=metric`;
-    }
     axios.get(apiUrl).then(showTemperature);
+    }
+   
+    function handleSubmit(event) {
+        event.preventDefault();
+        let cityInputElement = document.querySelector("#city-input");
+        search(cityInputElement.value);
+      }
+
+      function showFarenheitTemperature(event){
+        event.preventDefault();
+        celsiusLink.classList.remove("active");
+        farenheitLink.classList.add("active");
+        let farenheitTemperature = (celsiusTemperature *9) /5 +32;
+        let temperatureElement= document.querySelector("#temperature");
+        temperatureElement.innerHTML= Math.round(farenheitTemperature);
+      }
+
+      function showCelsiusTemperature(event){
+       event.preventDefault();
+       celsiusLink.classList.add("active");
+       farenheitLink.classList.remove("active");
+       let temperatureElement= document.querySelector("#temperature");
+       temperatureElement.innerHTML= Math.round(celsiusTemperature);
+     }
+      
+      let celsiusTemperature= null;
+
+      let form = document.querySelector("#search-form");
+      form.addEventListener("submit", handleSubmit);
+
+
+let farenheitLink= document.querySelector("#farenheit-link");
+farenheitLink.addEventListener("click", showFarenheitTemperature);
+
+let celsiusLink= document.querySelector("#celsius-link");
+celsiusLink.addEventListener("click", showCelsiusTemperature);
+
+
 search ("Tehran");
