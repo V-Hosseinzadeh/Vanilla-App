@@ -32,47 +32,55 @@ function formatDay(timestamp) {
     return days[day];
   }
 
-  function showForecast() {
+  function showForecast(response) {
+    let forecast= response.data.daily;
 let forecastElement= document.querySelector("#forecast");
-let days =["Mon","Tue","Wed","Thu","Fri",];
+
+let days= ["Mon","Tue","Wed","Thu","Fri",];
 let forecastHTML  =`<div class="row">`;
-days.forEach(function(day) {
+
+forecast.forEach(function(forecastDay, index) {
+  if (index<6) {
 forecastHTML= 
 forecastHTML +
 `
           
              <div class="col-2">
-                        <div class="weather-forecast-date">${day}</div>
-                       <img src="http://shecodes-assets.s3.amazonaws.com/api/weather/icons/scattered-clouds-day.png"
-                        alt="" width="42" 
+                        <div class="weather-forecast-date">${formatDay(forecastDay.time)}</div>
+                         <img src= "http://shecodes-assets.s3.amazonaws.com/api/weather/icons/${forecastDay.condition.icon}.png"
+                        alt="" width="42"
                         />
-                
                     <div class="weather-forecast-temperature">
-                        <span class="weather-forecast-temperature-max">25° </span>
-                        <span class="weather-forecast-temperature-min">15°</span>
-                    
-                        
-
+                        <span class="weather-forecast-temperature-max">${Math.round(forecastDay.temperature.maximum)}° </span>
+                        <span class="weather-forecast-temperature-min">${Math.round(forecastDay.temperature.minimum)}°</span>
+                      
                     </div>
-            </div>
+             </div>
 `;
+ }
 })
 forecastHTML=forecastHTML + `</div>`
   
 forecastElement.innerHTML=forecastHTML;
-connsole.log(forecastHTML);
+console.log(forecastHTML);
   }
 
+function getForecast(coordinates){
+  console.log(coordinates);
+  let apiKey="b80ba723209860a35452o2bb8f4f0tb3";
+  let apiUrl=`https://api.shecodes.io/weather/v1/forecast?lon=${coordinates.longitude}&lat=${coordinates.latitude}&key=${apiKey}&units=metric`;
+  console.log(apiUrl);
+  axios.get(apiUrl).then(showForecast);
+}
 
 function showTemperature (response) {
-    
-let temperatureElement= document.querySelector("#temperature");
-let cityElement= document.querySelector("#city");
-let descriptionElement= document.querySelector("#description");
-let humidityElement= document.querySelector("#humidity");
-let windElement= document.querySelector("#wind");
-let dateElement= document.querySelector("#date");
-let iconElement= document.querySelector("#icon");
+ let temperatureElement= document.querySelector("#temperature");
+ let cityElement= document.querySelector("#city");
+ let descriptionElement= document.querySelector("#description");
+ let humidityElement= document.querySelector("#humidity");
+ let windElement= document.querySelector("#wind");
+ let dateElement= document.querySelector("#date");
+ let iconElement= document.querySelector("#icon");
 
 celsiusTemperature = response.data.temperature.current;
 
@@ -82,14 +90,17 @@ descriptionElement.innerHTML= response.data.condition.description;
 humidityElement.innerHTML= response.data.temperature.humidity;
 windElement.innerHTML= Math.round(response.data.wind.speed);
 dateElement.innerHTML= formatDate(response.data.time * 1000);
-iconElement.setAttribute ("src", `http://shecodes-assets.s3.amazonaws.com/api/weather/icons/${response.data.condition.icon}.png`);
+iconElement.setAttribute ("src",`http://shecodes-assets.s3.amazonaws.com/api/weather/icons/${response.data.condition.icon}.png`);
 iconElement.setAttribute("alt", response.data.condition.description);
+
+getForecast(response.data.coordinates);
 }
 
 function search(city) {
     let apiKey= "b80ba723209860a35452o2bb8f4f0tb3";
     let apiUrl= `https://api.shecodes.io/weather/v1/current?query=${city}&key=${apiKey}&units=metric`;
     axios.get(apiUrl).then(showTemperature);
+  
     }
    
     function handleSubmit(event) {
@@ -100,10 +111,12 @@ function search(city) {
 
       function showFarenheitTemperature(event){
         event.preventDefault();
+        let temperatureElement= document.querySelector("#temperature");
+
         celsiusLink.classList.remove("active");
         farenheitLink.classList.add("active");
         let farenheitTemperature = (celsiusTemperature *9) /5 +32;
-        let temperatureElement= document.querySelector("#temperature");
+        
         temperatureElement.innerHTML= Math.round(farenheitTemperature);
       }
 
@@ -127,6 +140,4 @@ farenheitLink.addEventListener("click", showFarenheitTemperature);
 let celsiusLink= document.querySelector("#celsius-link");
 celsiusLink.addEventListener("click", showCelsiusTemperature);
 
-
 search ("Tehran");
-+showForecast();
